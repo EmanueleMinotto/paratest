@@ -2,6 +2,7 @@
 namespace ParaTest\Runners\PHPUnit;
 
 use Exception;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class Worker
 {
@@ -32,7 +33,8 @@ class Worker
         if ($uniqueToken) {
             $bin .= "UNIQUE_TEST_TOKEN=$uniqueToken ";
         }
-        $bin .= PHP_BINARY . " \"$wrapperBinary\"";
+        $finder = new PhpExecutableFinder();
+        $bin .= $finder->find() . " \"$wrapperBinary\"";
         $pipes = [];
         $this->proc = proc_open($bin, self::$descriptorspec, $pipes);
         $this->pipes = $pipes;
