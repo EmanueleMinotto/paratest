@@ -188,6 +188,9 @@ abstract class ExecutableTest
         $this->assertValidCommandLineLength($command);
         $this->lastCommand = $command;
         $this->process = new Process($command, null, $environmentVariables);
+        if (method_exists($this->process, 'inheritEnvironmentVariables')) {
+            $this->process->inheritEnvironmentVariables();
+        }
         $this->process->start();
         return $this;
     }
@@ -297,21 +300,18 @@ abstract class ExecutableTest
      */
     protected function getCommandString($binary, $options = [])
     {
-        $builder = new ProcessBuilder();
-        $builder->setPrefix($binary);
+        $arguments = [$binary];
         foreach ($options as $key => $value) {
-            $builder->add("--$key");
+            $arguments[] = "--$key";
             if ($value !== null) {
-                $builder->add($value);
+                $arguments[] = $value;
             }
         }
 
-        $builder->add($this->fullyQualifiedClassName);
-        $builder->add($this->getPath());
+        $arguments[] = $this->fullyQualifiedClassName ?? '';
+        $arguments[] = $this->getPath();
 
-        $process = $builder->getProcess();
-
-        return $process->getCommandLine();
+        return (new Process($arguments))->getCommandLine();
     }
 
     /**

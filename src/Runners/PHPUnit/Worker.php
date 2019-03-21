@@ -142,8 +142,6 @@ class Worker
     {
         if ($this->currentlyExecuting !== null) {
             return $this->currentlyExecuting->getCoverageFileName();
-        } else {
-            return null;
         }
     }
 
